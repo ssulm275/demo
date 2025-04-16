@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECS Sample Application</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to the ECS Sample Application</h1>
+            <p>This application is running in an AWS ECS Fargate container.</p>
+        </header>
+        
+        <main>
+            <section class="info-card">
+                <h2>Container Information</h2>
+                <div id="container-info">Loading...</div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Deployed with AWS ECS and Terraform</p>
+        </footer>
+    </div>
+
+    <script>
+        // Fetch container information from API
+        async function fetchContainerInfo() {
+            try {
+                const response = await fetch('/api/info');
+                const data = await response.json();
+                
+                document.getElementById('container-info').innerHTML = `
+                    <div class="info-item">
+                        <span>Hostname:</span> ${data.hostname}
+                    </div>
+                    <div class="info-item">
+                        <span>Platform:</span> ${data.platform}
+                    </div>
+                    <div class="info-item">
+                        <span>Uptime:</span> ${Math.floor(data.uptime / 60)} minutes
+                    </div>
+                    <div class="info-item">
+                        <span>Memory:</span> ${data.memory.free} free of ${data.memory.total} total
+                    </div>
+                    <div class="info-item">
+                        <span>CPUs:</span> ${data.cpus}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('container-info').innerHTML = `
+                    <div class="error">Error fetching container information</div>
+                `;
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Refresh container info every 5 seconds
+        fetchContainerInfo();
+        setInterval(fetchContainerInfo, 5000);
+    </script>
+</body>
+</html>
